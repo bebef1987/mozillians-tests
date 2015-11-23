@@ -15,14 +15,14 @@ from selenium.webdriver.support.select import Select
 
 
 class Settings(Base):
-    _profile_tab_locator = (By.ID, "profile-tab")
-    _profile_button_locator = (By.CSS_SELECTOR, "#profile-li > a")
+    _profile_tab_locator = (By.ID, 'profile-tab')
+    _profile_button_locator = (By.CSS_SELECTOR, '#profile-li > a')
 
-    _you_and_mozilla_tab_locator = (By.ID, "youandmozilla-tab")
-    _you_and_mozilla_button_locator = (By.CSS_SELECTOR, "#youandmozilla-li > a")
+    _you_and_mozilla_tab_locator = (By.ID, 'youandmozilla-tab')
+    _you_and_mozilla_button_locator = (By.CSS_SELECTOR, '#youandmozilla-li > a')
 
-    _developer_tab_locator = (By.ID, "developer-tab")
-    _developer_button_locator = (By.CSS_SELECTOR, "#developer-li > a")
+    _developer_tab_locator = (By.ID, 'developer-tab')
+    _developer_button_locator = (By.CSS_SELECTOR, '#developer-li > a')
 
     @property
     def profile(self):
@@ -34,18 +34,18 @@ class Settings(Base):
     def you_and_mozilla(self):
         self.selenium.find_element(*self._you_and_mozilla_button_locator).click()
         return self.YouAndMozilla(self.base_url, self.selenium,
-                               self.selenium.find_element(*self._you_and_mozilla_tab_locator))
+                                  self.selenium.find_element(*self._you_and_mozilla_tab_locator))
 
     @property
     def developer(self):
         self.selenium.find_element(*self._developer_button_locator).click()
         return self.DeveloperTab(self.base_url, self.selenium,
-                               self.selenium.find_element(*self._developer_tab_locator))
+                                 self.selenium.find_element(*self._developer_tab_locator))
 
     class ProfileTab(PageRegion):
-        _basic_info_form_locator = (By.CSS_SELECTOR, "form.edit-profile:nth-child(1)")
-        _skills_form_locator = (By.CSS_SELECTOR, "form.edit-profile:nth-child(3)")
-        _delete_account_form_loator = (By.CSS_SELECTOR, "div.panel-danger")
+        _basic_info_form_locator = (By.CSS_SELECTOR, 'form.edit-profile:nth-child(1)')
+        _skills_form_locator = (By.CSS_SELECTOR, 'form.edit-profile:nth-child(3)')
+        _delete_account_form_locator = (By.CSS_SELECTOR, 'div.panel-danger')
 
         @property
         def basic_information(self):
@@ -60,7 +60,7 @@ class Settings(Base):
         @property
         def delete_account(self):
             return self.DeleteAccount(self.base_url, self.selenium,
-                                      self._root_element.find_element(*self._delete_account_form_loator))
+                                      self._root_element.find_element(*self._delete_account_form_locator))
 
         class EditProfileForm (PageRegion):
 
@@ -91,7 +91,7 @@ class Settings(Base):
 
             @property
             def is_delete_button_enabled(self):
-                return not 'disabled' in self._root_element.find_element(*self._delete_profile_button_locator).get_attribute("class")
+                return 'disabled' not in self._root_element.find_element(*self._delete_profile_button_locator).get_attribute('class')
 
             def click_delete_profile(self):
                 self._root_element.find_element(*self._delete_profile_button_locator).click()
@@ -99,7 +99,7 @@ class Settings(Base):
                 return ConfirmProfileDelete(self.base_url, self.selenium)
 
         class SkillsForm(PageRegion):
-            _skills_locator = (By.CSS_SELECTOR, "#skills .tagit-label")
+            _skills_locator = (By.CSS_SELECTOR, '#skills .tagit-label')
             _skills_field_locator = (By.CSS_SELECTOR, '#id_skills + ul input')
             _delete_skill_buttons_locator = (By.CSS_SELECTOR, '#skills .tagit-close')
             _update_locator = (By.ID, 'form-submit-top')
@@ -123,12 +123,12 @@ class Settings(Base):
 
     class YouAndMozilla(PageRegion):
 
-        _contributions_form_locator = (By.CSS_SELECTOR, "form.edit-profile:nth-child(1)")
+        _contributions_form_locator = (By.CSS_SELECTOR, 'form.edit-profile:nth-child(1)')
 
         @property
         def contributions(self):
             return self.Contributions(self.base_url, self.selenium,
-                                        self._root_element.find_element(*self._contributions_form_locator))
+                                      self._root_element.find_element(*self._contributions_form_locator))
 
         class Contributions(PageRegion):
 
@@ -144,43 +144,45 @@ class Settings(Base):
                 element = self._root_element.find_element(*self._select_month_locator)
                 select = Select(element)
                 select.select_by_value(option_month)
-        
+
             def select_year(self, option_year):
                 element = self._root_element.find_element(*self._select_year_locator)
                 select = Select(element)
                 select.select_by_value(option_year)
-        
+
             @property
             def month(self):
+                # Return selected month text
                 return self._root_element.find_element(*self._selected_month_locator).text
-        
+
             @property
             def year(self):
+                # Return selected year text
                 return self._root_element.find_element(*self._selected_year_locator).text
-        
+
             @property
             def months_values(self):
+                # Return all month values
                 return [month.get_attribute('value') for month in self._root_element.find_elements(*self._month_locator)]
-        
+
+            @property
+            def years_values(self):
+                # Return all year values
+                return [year.get_attribute('value') for year in self._root_element.find_elements(*self._year_locator)]
+
             def select_random_month(self):
                 return self.select_month(random.choice(self.months_values[1:]))
 
             def select_random_year(self):
                 return self.select_year(random.choice(self.years_values[1:]))
 
-            @property
-            def years_values(self):
-                return [year.get_attribute('value') for year in self._root_element.find_elements(*self._year_locator)]
-
             def click_update(self):
                 self._root_element.find_element(*self._update_locator).click()
-
 
     class DeveloperTab(PageRegion):
 
         _services_bugzilla_locator = (By.ID, 'services-bugzilla-url')
         _services_mozilla_reps_locator = (By.ID, 'services-mozilla-reps')
-
 
         def get_services_urls(self):
             locs = [self._services_bugzilla_locator, self._services_mozilla_reps_locator]
